@@ -7,8 +7,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-
 import java.util.List;
+
 @Entity
 @Table(name = "shopping_cart")
 public class ShoppingCart {
@@ -30,7 +30,6 @@ public class ShoppingCart {
     public void setId(Long id) {
         this.id = id;
     }
-
 
     public List<Ticket> getTickets() {
         return tickets;
