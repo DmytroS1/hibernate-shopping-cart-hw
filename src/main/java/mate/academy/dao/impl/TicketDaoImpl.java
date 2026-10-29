@@ -1,23 +1,35 @@
 package mate.academy.dao.impl;
 
-import jakarta.persistence.EntityManager;
 import mate.academy.dao.TicketDao;
+import mate.academy.exception.DataProcessingException;
+import mate.academy.lib.Dao;
 import mate.academy.model.Ticket;
 import mate.academy.util.HibernateUtil;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
+@Dao
 public class TicketDaoImpl implements TicketDao {
-
-    private EntityManager getEntityManager() {
-        return HibernateUtil.getEntityManager();
-    }
-
     @Override
     public Ticket add(Ticket ticket) {
-        try (EntityManager em = HibernateUtil.getEntityManager()) {
-            em.getTransaction().begin();
-            em.persist(ticket);
-            em.getTransaction().commit();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
+            transaction = session.beginTransaction();
+            session.persist(ticket);
+            transaction.commit();
             return ticket;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw new DataProcessingException("Can't insert "
+                    + "ticket: " + ticket, e);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
         }
     }
 }
